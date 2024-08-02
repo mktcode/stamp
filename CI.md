@@ -47,3 +47,7 @@ If you do that in a way that is actually executable, you get the added benefit o
 ## Deployment
 
 To make merging into master even less exciting and more a good habit, we will pause continuous deployment/delivery to production. Instead we tag individual commits on master with a semantic version number to trigger deployments to production. In addition to that there will be a completely separated but identical test deployment that is always in sync with master.
+
+## Kanban
+
+...
