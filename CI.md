@@ -1,14 +1,12 @@
 # Continuous Integration Guide
 
-(PREVIEW: FULL OF CRAP STILL!)
-
 In order to prevent the review process from unnecessarily blocking progress, anyone with write access is allowed to merge their own pull requests. Tests and other CI jobs are of course still in place and will be improved, so they will allow to merge changes fully automatically. Requesting a code review and waiting for approval is an optional step. **That does not mean we do less review!** It means we put more of the responsibility into the developers own hands and “shift left” on quality, meaning **more focus on the beginning of the process instead of the end**. Pull requests will often be more like reports and (human) review has already happened.
 
 This has a lot to do with culture and mindset and also the right tools, which is what I want to discuss here.
 
 # Commits
 
-While pull request can keep being our main tool for communication and documentation of change (and when you want to request review and approval of course), the commit stage should get a bit more attention.
+While we keep pull requests as our main tool for communication and documentation of change (and when you want to request review and approval of course), the commit stage should get a bit more attention.
 
 One challenge with authoring “good commits” is to stay focused on the change you actually want to implement, especially when it is sometimes necessary to change other parts of the system first or you are just very tempted to refactor something “quickly”. Sometimes your local changes can get very messy.
 
