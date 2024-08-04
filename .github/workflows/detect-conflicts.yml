@@ -14,6 +14,12 @@ jobs:
     - name: Set up Git
       run: git config user.name "github-actions" && git config user.email "github-actions@github.com"
 
+    - name: Install GitHub CLI
+      run: sudo apt-get install gh
+
+    - name: Authenticate GitHub CLI
+      run: gh auth setup-git
+
     - name: Fetch all pull requests
       run: |
         git fetch origin '+refs/pull/*/head:refs/remotes/origin/pr/*'
@@ -26,16 +32,28 @@ jobs:
         
         # List all PR branches
         PR_BRANCHES=$(git branch -r | grep 'origin/pr/' | grep -v "$CURRENT_PR_BRANCH")
-        echo "PR_BRANCHES: $PR_BRANCHES"
+        echo "PR_BRANCHES:\n$PR_BRANCHES"
         
-        # Function to check conflicts
+        # Function to check conflicts and comment
         check_conflict() {
           LOCAL_BRANCH=$1
           echo "Checking conflicts with $LOCAL_BRANCH"
           git fetch origin
           git checkout -b "temp-branch" "$LOCAL_BRANCH"
           git checkout "$CURRENT_PR_BRANCH"
-          git merge --no-commit --no-ff "temp-branch" || echo "Conflict detected with $LOCAL_BRANCH"
+          if git merge --no-commit --no-ff "temp-branch"; then
+            echo "No conflicts with $LOCAL_BRANCH"
+          else
+            echo "Conflict detected with $LOCAL_BRANCH"
+            CONFLICT_MSG="Conflict detected between PR #$PR_NUMBER and PR $(echo "$LOCAL_BRANCH" | sed 's/origin\/pr\///')"
+            
+            # Comment on the current PR
+            gh pr comment "$PR_NUMBER" --body "$CONFLICT_MSG"
+            
+            # Comment on the conflicting PR
+            CONFLICTING_PR_NUMBER=$(echo "$LOCAL_BRANCH" | sed 's/origin\/pr\///')
+            gh pr comment "$CONFLICTING_PR_NUMBER" --body "$CONFLICT_MSG"
+          fi
           git checkout -f "$CURRENT_PR_BRANCH"
           git branch -D "temp-branch"
         }
