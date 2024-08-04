@@ -18,7 +18,9 @@ jobs:
       run: sudo apt-get install gh
 
     - name: Authenticate GitHub CLI
-      run: gh auth setup-git
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: gh auth login --with-token <<< "$GH_TOKEN"
 
     - name: Fetch all pull requests
       run: |
