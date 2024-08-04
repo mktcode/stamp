@@ -1,0 +1,51 @@
+name: Feature Shaping
+description: Use this template to start discussing future changes.
+title: "shape: "
+labels: ["shaping"]
+projects: ["mktcode/4"]
+assignees:
+  - mkcode
+body:
+
+  - type: textarea
+    id: product-impact
+    attributes:
+      label: Product Impact
+      description: "Very briefly: How does this affect the product? Why is this important? Go to the Kanban board and look at the product column, if you aren't sure."
+      placeholder: "e.g.: Better performance!"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Category
+      description: What kind of changes are needed?
+      options:
+        - label: Hotfix
+        - label: Refactoring
+        - label: Implementation
+        - label: Infrastructure
+        - label: Chores/Documentation
+
+  - type: textarea
+    id: relevant-information
+    attributes:
+      label: Relevant Information
+      description: What do we know or need to, before starting the implementation? Share links, screenshots, or any other relevant resources.
+      placeholder: "e.g.: See issue #123"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        # Checklist
+
+        All these questions should be answered before moving on to implementation. We don’t need a scientific thesis, but ensure that you have considered these questions thoroughly.
+
+        - [ ] What is the maximum time we want to spend on this?
+        - [ ] Did we do some prototyping or browsing through the code to get an idea of what expects us?
+        - [ ] Is the scope clearly defined and aligned with that? What tradeoffs have been made?
+        - [ ] Do we have clear success/done criteria and have tests been discussed/drafted?
+        - [ ] Have all emerging subtasks been identified and clearly shaped as well?
