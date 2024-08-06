@@ -62,12 +62,10 @@ jobs:
             const image = fs.readFileSync(imagePath);
             const base64Image = image.toString('base64');
 
-            const { issue_id } = process.env;
-
             const result = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: issue_id,
+              issue_number: ${{ inputs.issue_id }},
               body: `![image](data:image/png;base64,${base64Image})`
             });
 
