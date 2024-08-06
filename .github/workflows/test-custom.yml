@@ -1,0 +1,76 @@
+name: Test Custom
+
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        required: true
+        type: string
+        default: '/avatar/fabient.eth'
+      target:
+        required: false
+        type: string
+        default: '18'
+      redis_version:
+        required: false
+        type: string
+        default: '7'
+      issue_id:
+        required: true
+        type: string
+        default: '3'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.target }}
+          cache: 'yarn'
+
+      - name: Setup Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: ${{ inputs.redis_version }}
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Start
+        run: yarn start &
+
+      - name: Fetch image
+        id: fetch_image
+        run: |
+          curl -o image.png "http://localhost:3008${{ inputs.path }}"
+
+      - name: Upload image to GitHub Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const imagePath = path.join(process.cwd(), 'image.png');
+            const image = fs.readFileSync(imagePath);
+            const base64Image = image.toString('base64');
+
+            const { issue_id } = process.env;
+
+            const result = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_id,
+              body: `![image](data:image/png;base64,${base64Image})`
+            });
+
+            console.log(result.data);
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
