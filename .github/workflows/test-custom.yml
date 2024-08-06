@@ -15,10 +15,10 @@ on:
         required: false
         type: string
         default: '7'
-      issue_id:
+      pr_id:
         required: true
         type: string
-        default: '3'
+        default: '13'
 
 jobs:
   test:
@@ -52,25 +52,31 @@ jobs:
       - name: Fetch image
         id: fetch_image
         run: |
-          curl -o image.png "http://localhost:3008${{ inputs.path }}"
+          curl -o image.webp "http://localhost:3008${{ inputs.path }}"
 
-      - name: Upload image to GitHub Issue
+      - name: Convert image to base64
+        id: convert_image
+        run: |
+          echo "::set-output name=image_base64::$(base64 -w 0 image.webp)"
+          
+      - name: Add comment
         uses: actions/github-script@v6
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ inputs.pr_id }}
         with:
           script: |
-            const fs = require('fs');
-            const path = require('path');
-            const imagePath = path.join(process.cwd(), 'image.png');
-            const image = fs.readFileSync(imagePath);
-            const base64Image = image.toString('base64');
+            const base64Image = '${{ steps.convert_image.outputs.image_base64 }}';
+            const issueNumber = process.env.NUMBER;
+            const body = `
+              Test result:
+              
+              ![Fetched Image](data:image/png;base64,${base64Image})
+            `;
 
-            const result = await github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ inputs.issue_id }},
-              body: `![image](data:image/png;base64,${base64Image})`
+              issue_number: issueNumber,
+              body: body
             });
-
-            console.log(result.data);
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
