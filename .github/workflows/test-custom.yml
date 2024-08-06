@@ -6,7 +6,7 @@ on:
       path:
         required: true
         type: string
-        default: '/avatar/fabient.eth'
+        default: '/avatar/fabien.eth'
       target:
         required: false
         type: string
