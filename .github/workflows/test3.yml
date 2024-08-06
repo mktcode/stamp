@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
+      
     steps:
       - name: Add comment
         run: gh issue comment "$NUMBER" --body "$BODY"
