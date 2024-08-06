@@ -55,16 +55,17 @@ jobs:
         run: |
           curl -o image.webp "http://localhost:3008${{ inputs.path }}"
 
-      - name: Store image
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-image
-          path: |
-            image.webp
-
       - name: Convert image to base64
         id: convert_image
-        run: echo "IMAGE=$(base64 -w 0 image.webp)" >> $GITHUB_OUTPUT
+        run: echo "<html><body>${{ inputs.path }}:<br /><img src=\"$(base64 -w 0 image.webp)\" /></body></html>" > test-report.html
+
+      - name: Store image
+        id: store-image
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            test-report.html
           
       - name: Add comment
         run: gh issue comment "$NUMBER" --body "$BODY"
@@ -73,4 +74,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ inputs.pull_request }}
           BODY: >
-            ![Fetched Image](data:image/webp;base64,${{ steps.convert_image.outputs.IMAGE }})
+            [Download test report](${{ steps.store-image.outputs.artifact-url }})
