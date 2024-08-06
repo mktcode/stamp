@@ -15,7 +15,7 @@ on:
         required: false
         type: string
         default: '7'
-      pr_id:
+      pull_request:
         required: true
         type: string
         default: '13'
@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v3
@@ -56,27 +57,13 @@ jobs:
 
       - name: Convert image to base64
         id: convert_image
-        run: |
-          echo "::set-output name=image_base64::$(base64 -w 0 image.webp)"
+        run: echo "IMAGE=$(base64 -w 0 image.webp)" >> $GITHUB_OUTPUT
           
       - name: Add comment
-        uses: actions/github-script@v6
+        run: gh issue comment "$NUMBER" --body "$BODY"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NUMBER: ${{ inputs.pr_id }}
-        with:
-          script: |
-            const base64Image = '${{ steps.convert_image.outputs.image_base64 }}';
-            const issueNumber = process.env.NUMBER;
-            const body = `
-              Test result:
-              
-              ![Fetched Image](data:image/png;base64,${base64Image})
-            `;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issueNumber,
-              body: body
-            });
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ inputs.pull_request }}
+          BODY: >
+            ![Fetched Image](data:image/png;base64,${{ steps.convert_image.outputs.IMAGE }})
