@@ -57,7 +57,7 @@ jobs:
 
       - name: Convert image to base64
         id: convert_image
-        run: echo "<html><body>${{ inputs.path }}:<br /><img src=\"$(base64 -w 0 image.webp)\" /></body></html>" > test-report.html
+        run: echo "<html><body>${{ inputs.path }}:<br /><img src=\"data:image/webp;base64,$(base64 -w 0 image.webp)\" /></body></html>" > test-report.html
 
       - name: Store image
         id: store-image
